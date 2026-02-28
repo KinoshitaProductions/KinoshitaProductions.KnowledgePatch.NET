@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <DefineConstants>ANDROID</DefineConstants>
+  </PropertyGroup>
+</Project>

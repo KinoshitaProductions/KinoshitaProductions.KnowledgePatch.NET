@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net9.0-android</TargetFrameworks>
+    <!--
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);net9.0-windows10.0.17763;</TargetFrameworks>
+    -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ProjectGuid>{2A9547AA-B269-4B95-A31A-D109D133DA90}</ProjectGuid>
+    <PackageId>KinoshitaProductions.KnowledgePatch</PackageId>
+    <AssemblyName>KinoshitaProductions.KnowledgePatch</AssemblyName>
+    <RootNamespace>KinoshitaProductions.KnowledgePatch</RootNamespace>
+    <Authors>Kinoshita Shimizu</Authors>
+    <Company>Kinoshita Productions</Company>
+    <PackageDescription>This is our API request and response patch library.</PackageDescription>
+    <RepositoryUrl>https://github.com/KinoshitaProductions/KinoshitaProductions.KnowledgePatch.NET</RepositoryUrl>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    <PackageTags>http;api;patch;knowledge;configuration;request;response</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <LangVersion>10</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**\*</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ImportGroup Condition=" $(TargetFramework.EndsWith('-android')) ">
+    <Import Project="KinoshitaProductions.KnowledgePatch.Android.props" />
+  </ImportGroup>
+  <ImportGroup Condition=" $(TargetFramework.Contains('-windows')) ">
+	  <Import Project="KinoshitaProductions.KnowledgePatch.Windows.props" />
+  </ImportGroup>
+  <ImportGroup Condition=" $(TargetFramework) != 'netstandard2.0' ">
+	  <Import Project="KinoshitaProductions.KnowledgePatch.NotNetStandard.props" />
+  </ImportGroup>
+
+  <ItemGroup>
+    <PackageReference Include="KinoshitaProductions.Common" Version="1.0.10" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="SoftCircuits.HtmlMonkey" Version="2.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
