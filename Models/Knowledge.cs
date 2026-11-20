@@ -167,9 +167,9 @@ public class Knowledge
     {
         var userKey = configuration.UserKey;
         var tokenKey = configuration.TokenKey;
-        if (!string.IsNullOrWhiteSpace(values.User))
+        if (!string.IsNullOrWhiteSpace(userKey) && !string.IsNullOrWhiteSpace(values.User))
             query[userKey] = values.User;
-        if (!string.IsNullOrWhiteSpace(values.Token))
+        if (!string.IsNullOrWhiteSpace(tokenKey) && !string.IsNullOrWhiteSpace(values.Token))
             query[tokenKey] = values.Token;
     }
 
@@ -194,19 +194,20 @@ public class Knowledge
 
     private void InjectRequestAuthentication(HttpRequestMessage request)
     {
-        bool usesAuthenticationQueryString = AuthenticationType == Common.Enums.AuthenticationType.QueryString;
+        bool usesAuthenticationQueryString = AuthenticationType == Common.Enums.AuthenticationType.QueryString
+            && AuthenticationConfiguration is { CustomHandling: false }
+            && AuthenticationValues != null;
         bool usesExtraParamsOnQueryString = RequestParameters is { Length: > 0 };
-        if (AuthenticationValues != null && AuthenticationConfiguration?.CustomHandling != true && (usesAuthenticationQueryString || usesExtraParamsOnQueryString))
-        {
-            var builder = new UriBuilder(request.RequestUri!);
-            var query = HttpUtility.ParseQueryString(builder.Query);
-            if (usesAuthenticationQueryString && AuthenticationConfiguration != null)
-                InjectQueryStringAuthentication(query, AuthenticationConfiguration, AuthenticationValues);
-            if (usesExtraParamsOnQueryString && RequestParameters is { Length: > 0 })
-                InjectExtraRequestQueryParameters(request, query, RequestParameters);
-            builder.Query = query.ToString();
-            request.RequestUri = builder.Uri;
-        }
+        if (!usesAuthenticationQueryString && !usesExtraParamsOnQueryString) return;
+
+        var builder = new UriBuilder(request.RequestUri!);
+        var query = HttpUtility.ParseQueryString(builder.Query);
+        if (usesExtraParamsOnQueryString && RequestParameters is { Length: > 0 })
+            InjectExtraRequestQueryParameters(request, query, RequestParameters);
+        if (usesAuthenticationQueryString && AuthenticationConfiguration != null && AuthenticationValues is { } authenticationValues)
+            InjectQueryStringAuthentication(query, AuthenticationConfiguration, authenticationValues);
+        builder.Query = query.ToString();
+        request.RequestUri = builder.Uri;
     }
     
     // ReSharper disable once UnusedMember.Global
